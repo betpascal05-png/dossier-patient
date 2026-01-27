@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MED-ARCHIVE | Connexion Sécurisée</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+</head>
+<body>
+
+    <div id="login-overlay">
+        <div class="login-card">
+            <span class="material-icons login-icon">lock</span>
+            <h2>Accès Sécurisé à MED-ARCHIVE</h2>
+            <p>Connectez-vous pour accéder aux dossiers.</p>
+            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="password" id="login-password" placeholder="Mot de passe" required>
+            <button id="login-btn" class="main-btn">Se connecter</button>
+            <p id="login-error" class="error-message"></p>
+        </div>
+    </div>
+
+    <div id="app-container" style="display:none;">
+        <nav class="sidebar">
+            <div class="logo"><span class="material-icons">cloud_done</span> MED-CLOUD</div>
+            <div class="user-info">
+                <span class="material-icons">person</span>
+                <span id="user-email"></span>
+                <button id="logout-btn" class="btn-icon btn-delete" title="Déconnexion"><span class="material-icons">logout</span></button>
+            </div>
+            <ul>
+                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> Tableau de Bord</li>
+                <li id="link-patients"><span class="material-icons">person</span> Dossiers Actifs</li>
+                <li id="link-archives"><span class="material-icons">inventory_2</span> Archives</li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <header>
+                <div class="header-titles">
+                    <h1 id="page-title">Tableau de Bord</h1>
+                    <div class="search-bar">
+                        <span class="material-icons">search</span>
+                        <input type="text" id="search-input" placeholder="Rechercher un patient...">
+                    </div>
+                </div>
+                <button id="open-modal-btn" class="main-btn">
+                    <span class="material-icons">add</span> Nouveau Dossier
+                </button>
+            </header>
+
+            <section class="stats">
+                <div class="card"><span class="material-icons" style="color:#3498db">groups</span><div><p>Total Patients</p><b id="count-total">0</b></div></div>
+                <div class="card"><span class="material-icons" style="color:#2ecc71">check_circle</span><div><p>En ligne</p><b>Firebase OK</b></div></div>
+            </section>
+
+            <div class="table-container">
+                <table class="patient-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom & Prénom</th>
+                            <th>Âge</th>
+                            <th>Diagnostic</th>
+                            <th>Statut</th>
+                            <th>Modifié par</th> <th>Date modif</th> <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="patient-list"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="modal-patient" class="modal">
+        <div class="modal-content">
+            <h2>Dossier Médical</h2>
+            <form id="patient-form">
+                <input type="hidden" id="edit-id">
+                <div class="form-group">
+                    <input type="text" id="p-nom" placeholder="NOM" required style="text-transform: uppercase;">
+                    <input type="text" id="p-prenom" placeholder="Prénom" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="p-age" placeholder="Âge" required>
+                    <input type="text" id="p-diag" placeholder="Diagnostic principal" required>
+                </div>
+                
+                <div class="ocr-section">
+                    <label><span class="material-icons">photo_camera</span> Scanner un document</label>
+                    <div id="video-box" style="display:none;" class="video-container">
+                        <video id="video" autoplay playsinline></video>
+                    </div>
+                    <div class="ocr-controls">
+                        <button type="button" id="start-camera" class="btn-secondary">Ouvrir Caméra</button>
+                        <button type="button" id="capture-ocr" class="btn-secondary" style="display:none; background:#2ecc71;">Capturer & Analyser</button>
+                    </div>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <textarea id="p-ocr-result" placeholder="Le texte extrait apparaîtra ici..."></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="main-btn">Enregistrer dans le Cloud</button>
+                    <button type="button" id="close-modal" class="btn-delete">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
