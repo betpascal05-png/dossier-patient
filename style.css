@@ -1,0 +1,14 @@
+body { font-family:Segoe UI; background:#f4f6f8; margin:0; }
+.sidebar { width:220px;background:#1a2a3a;color:white;padding:20px; }
+.content { padding:30px; flex:1; }
+header { display:flex; justify-content:space-between; align-items:center; }
+.toolbar input, select, button { padding:8px;border-radius:6px;border:1px solid #ccc; }
+
+.stats-grid { display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin:20px 0; }
+.stat-card { background:white;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.1); }
+
+table { width:100%; background:white;border-radius:10px;overflow:hidden; }
+th,td { padding:12px;border-bottom:1px solid #eee; }
+
+.dark-mode { background:#111;color:white; }
+.dark-mode .stat-card, .dark-mode table { background:#1f1f1f;color:white; }

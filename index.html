@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>MED-ARCHIVE | Dashboard</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="login-overlay">
+  <div class="login-card">
+    <span class="material-icons">medical_services</span>
+    <h2>MED-ARCHIVE</h2>
+    <input id="login-email" placeholder="Email">
+    <input id="login-password" type="password" placeholder="Mot de passe">
+    <button id="login-btn">Connexion</button>
+  </div>
+</div>
+
+<div id="app-container" style="display:none;">
+  <nav class="sidebar">
+    <h2>MED-ARCHIVE</h2>
+    <button id="logout-btn">Déconnexion</button>
+  </nav>
+
+  <main class="content">
+    <header>
+      <h1>Dashboard</h1>
+      <div class="toolbar">
+        <input id="search-input" placeholder="🔍 Rechercher...">
+        <select id="filter-status">
+          <option value="TOUT">Tous</option>
+          <option value="Actif">Actif</option>
+          <option value="Archivé">Archivé</option>
+        </select>
+        <button id="export-btn">Exporter Excel</button>
+        <button id="theme-toggle">🌙</button>
+      </div>
+    </header>
+
+    <div class="stats-grid">
+      <div class="stat-card">Actifs <h2 id="stat-actif">0</h2></div>
+      <div class="stat-card">Archivés <h2 id="stat-archive">0</h2></div>
+      <div class="stat-card">Total <h2 id="stat-total">0</h2></div>
+    </div>
+
+    <canvas id="chart-dossiers"></canvas>
+
+    <table>
+      <thead>
+        <tr><th>Patient</th><th>Diagnostic</th><th>Statut</th><th>Auteur</th></tr>
+      </thead>
+      <tbody id="patient-list"></tbody>
+    </table>
+  </main>
+</div>
+
+<script type="module" src="script.js"></script>
+</body>
+</html>
