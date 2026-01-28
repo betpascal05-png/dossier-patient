@@ -1,66 +1,57 @@
-/* RESET POUR TOUT UNIFORMISER */
-* { 
-    margin: 0; 
-    padding: 0; 
-    box-sizing: border-box; /* Crucial pour les bordures iPhone/Android */
-    -webkit-tap-highlight-color: transparent; /* Enlève le flash bleu sur mobile */
-}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 :root { 
-    --bg: #f0f2f5; --side: #1a237e; --accent: #3f51b5; --text: #1c1e21; --card: #ffffff; 
+    --bg: #f5f7fb; --side: #1a237e; --accent: #3f51b5; --text: #2d3748; --card: #ffffff; --border: #e2e8f0;
 }
 
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
 
-/* LAYOUT RESPONSIVE */
-#app-container { display: flex; height: 100vh; width: 100vw; overflow: hidden; }
+#app-container { display: flex; height: 100vh; width: 100vw; }
 
-/* SIDEBAR : Devient une barre horizontale en bas sur mobile */
-.sidebar { 
-    width: 260px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 20px; transition: 0.3s;
-}
+/* BARRE LATERALE (PC) -> BARRE BASSE (MOBILE) */
+.sidebar { width: 260px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 20px; z-index: 100; }
+.side-brand { font-size: 1.3rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+.sidebar li { list-style: none; padding: 12px; border-radius: 10px; margin-bottom: 5px; cursor: pointer; display: flex; align-items: center; gap: 12px; opacity: 0.7; }
+.sidebar li.active { opacity: 1; background: rgba(255,255,255,0.15); }
 
-.main-content { flex: 1; padding: 20px; overflow-y: auto; width: 100%; }
+.main-content { flex: 1; padding: 20px; overflow-y: auto; }
 
-/* TABLEAU ET CARTES */
+/* STATS RESPONSIVES */
 .stats-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-.stat-card { background: var(--card); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.stat-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.stat-info h3 { font-size: 0.8rem; opacity: 0.7; }
+.stat-info p { font-size: 1.5rem; font-weight: 800; }
+.stat-chart { width: 50px; height: 30px; }
 
-.table-section { background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.table-scroll-container { overflow-x: auto; } /* Permet de scroller le tableau sur petit écran */
+/* TABLEAU CONFORME DESSIN */
+.table-section { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; min-width: 600px; }
+th { text-align: left; padding: 12px; font-size: 0.75rem; border-bottom: 2px solid var(--border); opacity: 0.6; }
+td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
 
-table { width: 100%; border-collapse: collapse; min-width: 500px; }
-th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #eee; }
+/* BOUTONS */
+.btn-main { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+.btn-outline-sm { background: var(--card); border: 1px solid var(--border); padding: 8px; border-radius: 8px; cursor: pointer; }
+.btn-icon { background: none; border: none; cursor: pointer; color: var(--text); opacity: 0.5; margin-right: 5px; vertical-align: middle; }
+.full-w { width: 100%; justify-content: center; }
 
 /* MODALE */
-.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 2000; align-items: center; justify-content: center; padding: 15px; }
-.modal-box { background: var(--card); width: 100%; max-width: 500px; border-radius: 16px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+.modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(5px); }
+.modal-box { background: var(--card); width: 100%; max-width: 500px; border-radius: 20px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+.m-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-top: 5px; font-size: 16px; }
 
-/* --- MEDIA QUERIES (POUR MOBILE) --- */
+/* ANIMATION OCR */
+.loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--accent); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 15px auto; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+/* ADAPTATION MOBILE */
 @media (max-width: 768px) {
     #app-container { flex-direction: column; }
-    
-    .sidebar { 
-        width: 100%; height: 70px; flex-direction: row; order: 2; /* Passe en bas */
-        padding: 5px 20px; justify-content: space-between; align-items: center;
-    }
-    
-    .side-brand { display: none; } /* On cache le logo sur mobile pour gagner de la place */
-    .sidebar nav { display: flex; width: 100%; justify-content: space-around; }
-    .nav-text { display: none; } /* On ne garde que les icônes en bas */
-    
+    .sidebar { width: 100%; height: 70px; flex-direction: row; order: 2; padding: 10px; }
+    .side-brand, .nav-text, .side-footer #theme-toggle { display: none; }
+    .sidebar nav { width: 100%; display: flex; justify-content: space-around; }
     .main-content { order: 1; height: calc(100vh - 70px); padding: 15px; }
-    
-    .stats-section { grid-template-columns: 1fr; } /* Stats une par une */
-    
-    .hide-mobile { display: none; } /* Cache les colonnes moins importantes */
-    
-    .search-bar { width: 100% !important; }
+    .stats-section { grid-template-columns: 1fr; }
+    .hide-mobile { display: none; }
 }
-
-/* BOUTONS ET INPUTS */
-.btn-main { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer; }
-.m-input { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; } /* 16px évite le zoom auto sur iPhone */
-
-.loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--accent); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
-@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
