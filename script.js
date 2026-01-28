@@ -21,7 +21,7 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         document.getElementById('login-overlay').style.display = 'none';
         document.getElementById('app-container').style.display = 'flex';
-        document.getElementById('user-display').innerText = user.email.split('@')[0];
+        document.getElementById('user-display').innerText = user.email;
         loadPatients();
     } else {
         document.getElementById('login-overlay').style.display = 'flex';
@@ -32,36 +32,25 @@ onAuthStateChanged(auth, (user) => {
 document.getElementById('login-btn').onclick = async () => {
     const email = document.getElementById('login-email').value;
     const pass = document.getElementById('login-password').value;
-    try {
-        await signInWithEmailAndPassword(auth, email, pass);
-    } catch (e) {
-        alert("Erreur de connexion");
-    }
+    try { await signInWithEmailAndPassword(auth, email, pass); } 
+    catch (e) { document.getElementById('login-error').innerText = "Accès refusé."; }
 };
 
 document.getElementById('logout-btn').onclick = () => signOut(auth);
 
-// --- NAVIGATION (LA BARRE DE GAUCHE) ---
-const navLinks = { 
-    'link-dashboard': 'TOUT', 
-    'link-patients': 'Actif', 
-    'link-archives': 'Archivé' 
-};
-
+// --- NAVIGATION ---
+const navLinks = { 'link-dashboard': 'TOUT', 'link-patients': 'Actif', 'link-archives': 'Archivé' };
 Object.keys(navLinks).forEach(id => {
     document.getElementById(id).onclick = function() {
         document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
         this.classList.add('active'); 
         currentFilter = navLinks[id];
-        
-        const titles = { 'TOUT': 'Tableau de Bord', 'Actif': 'Dossiers Actifs', 'Archivé': 'Archives' };
-        document.getElementById('page-title').innerText = titles[currentFilter];
-        
+        document.getElementById('page-title').innerText = this.innerText;
         loadPatients();
     };
 });
 
-// --- CHARGEMENT DES DONNÉES ---
+// --- CHARGEMENT DES DOSSIERS AVEC LES 3 ACTIONS ---
 function loadPatients() {
     onSnapshot(collection(db, "patients"), (snap) => {
         const list = document.getElementById('patient-list');
@@ -74,12 +63,15 @@ function loadPatients() {
                 <td><b>${p.nom}</b></td>
                 <td>${p.diagnostic}</td>
                 <td><span class="status ${p.statut === 'Actif' ? 'active-status' : ''}">${p.statut}</span></td>
-                <td><small>${p.auteur || 'Inconnu'}</small></td>
+                <td><small>${p.auteur.split('@')[0]}</small></td>
                 <td>
-                    <button onclick="window.toggleArch('${d.id}', '${p.statut}')" class="btn-icon">
+                    <button onclick="window.editP('${d.id}')" class="btn-icon" title="Modifier" style="color:#f39c12;">
+                        <span class="material-icons">edit</span>
+                    </button>
+                    <button onclick="window.toggleArch('${d.id}', '${p.statut}')" class="btn-icon" title="Archiver" style="color:#3498db;">
                         <span class="material-icons">${p.statut === 'Actif' ? 'archive' : 'unarchive'}</span>
                     </button>
-                    <button onclick="window.deleteP('${d.id}')" class="btn-icon" style="color:red;">
+                    <button onclick="window.deleteP('${d.id}')" class="btn-icon" title="Supprimer" style="color:#e74c3c;">
                         <span class="material-icons">delete</span>
                     </button>
                 </td>
@@ -88,23 +80,24 @@ function loadPatients() {
     });
 }
 
-// --- ACTIONS (FONCTION WINDOW POUR LE HTML) ---
-window.toggleArch = async (id, currentStat) => {
-    const newStat = currentStat === 'Actif' ? 'Archivé' : 'Actif';
-    await updateDoc(doc(db, "patients", id), { statut: newStat });
+// --- ACTIONS GLOBALES ---
+window.toggleArch = async (id, current) => {
+    await updateDoc(doc(db, "patients", id), { statut: current === 'Actif' ? 'Archivé' : 'Actif' });
 };
 
 window.deleteP = async (id) => {
-    if(confirm("Supprimer définitivement ?")) await deleteDoc(doc(db, "patients", id));
+    if(confirm("Supprimer ce dossier définitivement ?")) await deleteDoc(doc(db, "patients", id));
 };
 
-// --- SAUVEGARDE ---
-document.getElementById('save-btn').onclick = async () => {
-    const nom = document.getElementById('p-nom').value;
-    if(!nom) return alert("Nom vide");
+window.editP = (id) => {
+    alert("Modification en cours pour : " + id);
+    // Ici, on pourrait ouvrir la modale et pré-remplir les champs.
+};
 
+// --- SAUVEGARDE ET OCR ---
+document.getElementById('save-btn').onclick = async () => {
     await addDoc(collection(db, "patients"), {
-        nom: nom,
+        nom: document.getElementById('p-nom').value,
         diagnostic: document.getElementById('p-diag').value,
         ocr_data: document.getElementById('p-ocr-result').value,
         statut: "Actif",
@@ -114,12 +107,11 @@ document.getElementById('save-btn').onclick = async () => {
     closeMod();
 };
 
-// --- CAMERA ET MODALE ---
 let strm;
 document.getElementById('start-camera').onclick = async () => {
     strm = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-    document.getElementById('video').srcObject = strm;
-    document.getElementById('video').style.display = 'block';
+    const v = document.getElementById('video');
+    v.srcObject = strm; v.style.display = 'block';
     document.getElementById('capture-ocr').style.display = 'inline-block';
 };
 
@@ -128,7 +120,7 @@ document.getElementById('capture-ocr').onclick = async () => {
     const video = document.getElementById('video');
     canvas.width = video.videoWidth; canvas.height = video.videoHeight;
     canvas.getContext('2d').drawImage(video, 0, 0);
-    document.getElementById('p-ocr-result').value = "Analyse...";
+    document.getElementById('p-ocr-result').value = "Analyse OCR...";
     const res = await Tesseract.recognize(canvas, 'fra');
     document.getElementById('p-ocr-result').value = res.data.text;
 };
