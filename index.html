@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MED-ARCHIVE | Chirurgie Viscérale</title>
-    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/387/387561.png">
+    <title>VISCÉRA-CLOUD | Dashboard Professionnel</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2859/2859207.png">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
@@ -13,72 +13,110 @@
 
     <div id="login-overlay">
         <div class="login-card">
-            <span class="material-icons login-icon">medical_services</span>
+            <div class="brand-icon"><span class="material-icons">biotech</span></div>
             <h2>MED-ARCHIVE</h2>
             <p>Unité de Chirurgie Viscérale</p>
-            <input type="email" id="login-email" placeholder="Email professionnel" required>
-            <input type="password" id="login-password" placeholder="Mot de passe" required>
-            <button id="login-btn" class="main-btn">Se connecter</button>
-            <p id="login-error" class="error-message"></p>
+            <input type="email" id="login-email" placeholder="Identifiant">
+            <input type="password" id="login-password" placeholder="Mot de passe">
+            <button id="login-btn" class="btn-primary">Accéder au Système</button>
+            <p id="login-error" style="color:red; margin-top:10px;"></p>
         </div>
     </div>
 
     <div id="app-container" style="display:none;">
-        <nav class="sidebar">
-            <div class="logo"><span class="material-icons">healing</span> VISCÉRA-CLOUD</div>
-            <div class="user-badge">
-                <span id="user-display">Utilisateur</span>
-                <button id="logout-btn"><span class="material-icons">logout</span></button>
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="material-icons">local_hospital</span>
+                <span>VISCÉRA-CLOUD</span>
             </div>
-            <ul>
-                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> Dashboard</li>
-                <li id="link-patients"><span class="material-icons">groups</span> Dossiers Actifs</li>
-                <li id="link-archives"><span class="material-icons">inventory_2</span> Archives</li>
-            </ul>
-        </nav>
+            <nav>
+                <ul>
+                    <li id="link-dashboard" class="active"><span class="material-icons">grid_view</span> Tableau de bord</li>
+                    <li id="link-patients"><span class="material-icons">person_search</span> Dossiers Actifs</li>
+                    <li id="link-archives"><span class="material-icons">history_edu</span> Archives</li>
+                </ul>
+            </nav>
+            <div class="user-info">
+                <p id="user-display">Docteur</p>
+                <button id="logout-btn"><span class="material-icons">power_settings_new</span></button>
+            </div>
+        </aside>
 
-        <main class="content">
-            <header>
+        <main class="main-content">
+            <header class="top-bar">
                 <h1 id="page-title">Tableau de Bord</h1>
-                <button id="open-modal-btn" class="main-btn"><span class="material-icons">add</span> Nouveau Dossier</button>
+                <button id="open-modal-btn" class="btn-add"><span class="material-icons">add</span> Nouveau Patient</button>
             </header>
 
-            <div class="table-container">
-                <table class="patient-table">
-                    <thead>
-                        <tr>
-                            <th>Patient</th>
-                            <th>Diagnostic</th>
-                            <th>Statut</th>
-                            <th>Auteur</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="patient-list"></tbody>
-                </table>
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon blue"><span class="material-icons">folder_shared</span></div>
+                    <div class="data"><h3>Total</h3><p id="stat-total">0</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon green"><span class="material-icons">check_circle</span></div>
+                    <div class="data"><h3>Actifs</h3><p id="stat-actifs">0</p></div>
+                </div>
+                <div class="stat-card">
+                    <div class="icon orange"><span class="material-icons">archive</span></div>
+                    <div class="data"><h3>Archivés</h3><p id="stat-archives">0</p></div>
+                </div>
+            </section>
+
+            <div class="content-wrapper">
+                <div class="search-box">
+                    <span class="material-icons">search</span>
+                    <input type="text" id="search-input" placeholder="Rechercher par nom ou diagnostic...">
+                </div>
+
+                <div class="table-container">
+                    <table class="modern-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Diagnostic principal</th>
+                                <th>Statut</th>
+                                <th>Dernière modification</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patient-list"></tbody>
+                    </table>
+                </div>
             </div>
         </main>
     </div>
 
     <div id="modal-patient" class="modal">
         <div class="modal-content">
-            <h2 id="modal-title">Fiche Patient</h2>
-            <input type="hidden" id="edit-id"> <input type="text" id="p-nom" placeholder="NOM ET PRÉNOM DU PATIENT">
-            <input type="text" id="p-diag" placeholder="DIAGNOSTIC VISCÉRAL">
-            
-            <div class="ocr-zone">
-                <video id="video" autoplay playsinline style="width:100%; display:none; border-radius:10px; margin-bottom: 10px;"></video>
-                <canvas id="canvas" style="display:none;"></canvas>
-                <div style="display: flex; gap: 10px; margin-bottom:10px;">
-                    <button type="button" id="start-camera" class="btn-secondary">Ouvrir Caméra</button>
-                    <button type="button" id="capture-ocr" class="btn-secondary" style="display:none; background:#2ecc71;">Scanner Document</button>
-                </div>
-                <textarea id="p-ocr-result" placeholder="Texte extrait de l'examen..."></textarea>
+            <div class="modal-header">
+                <h2 id="modal-title">Nouveau Dossier Médical</h2>
+                <span id="close-modal" class="material-icons btn-close">close</span>
             </div>
-
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <div class="input-group">
+                    <label>Nom Complet</label>
+                    <input type="text" id="p-nom" placeholder="Ex: Jean DUPONT">
+                </div>
+                <div class="input-group">
+                    <label>Diagnostic ou Motif</label>
+                    <input type="text" id="p-diag" placeholder="Ex: Appendicectomie">
+                </div>
+                
+                <div class="ocr-section">
+                    <label>Scan de documents (OCR)</label>
+                    <div class="camera-actions">
+                        <button id="start-camera" class="btn-sec"><span class="material-icons">photo_camera</span> Ouvrir Caméra</button>
+                        <button id="capture-ocr" class="btn-sec" style="display:none; background:#2ecc71;"><span class="material-icons">camera</span> Analyser</button>
+                    </div>
+                    <video id="video" autoplay playsinline style="display:none;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <textarea id="p-ocr-result" rows="4" placeholder="Résultat de l'analyse automatique..."></textarea>
+                </div>
+            </div>
             <div class="modal-footer">
-                <button id="save-btn" class="main-btn">Enregistrer</button>
-                <button id="close-modal" class="btn-delete">Annuler</button>
+                <button id="save-btn" class="btn-primary">Enregistrer dans le Cloud</button>
             </div>
         </div>
     </div>
