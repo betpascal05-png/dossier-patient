@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VISCÉRAL-CLOUD PRO</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2859/2859207.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+</head>
+<body class="light-theme">
+
+    <div id="login-overlay">
+        <div class="login-card">
+            <span class="material-icons brand-large">analytics</span>
+            <h2>VISCÉRAL-CLOUD</h2>
+            <p>Espace Praticien Sécurisé</p>
+            
+            <div class="input-group">
+                <span class="material-icons">email</span>
+                <input type="email" id="login-email" placeholder="Email professionnel">
+            </div>
+            
+            <div class="input-group">
+                <span class="material-icons">lock</span>
+                <input type="password" id="login-password" placeholder="Mot de passe">
+            </div>
+
+            <button id="login-btn" class="btn-login">Se connecter</button>
+            <p id="login-error" class="error-txt"></p>
+        </div>
+    </div>
+
+    <div id="app-container" style="display:none;">
+        
+        <aside class="sidebar">
+            <div class="side-brand"><span class="material-icons">shield</span> MED-CLOUD</div>
+            <nav>
+                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> <span class="nav-text">Dashboard</span></li>
+                <li id="link-patients"><span class="material-icons">groups</span> <span class="nav-text">Patients</span></li>
+                <li id="link-archives"><span class="material-icons">inventory_2</span> <span class="nav-text">Archives</span></li>
+            </nav>
+            <div class="side-footer">
+                <div id="theme-toggle" title="Changer le thème"><span class="material-icons">dark_mode</span></div>
+                <button id="logout-btn"><span class="material-icons">logout</span></button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="search-bar">
+                    <span class="material-icons">search</span>
+                    <input type="text" id="search-input" placeholder="Rechercher un dossier...">
+                </div>
+                <div class="header-btns">
+                    <button id="export-global-btn" class="btn-outline" title="Exporter tout en Excel"><span class="material-icons">description</span></button>
+                    <button id="open-modal-btn" class="btn-main circle-btn"><span class="material-icons">add</span></button>
+                </div>
+            </header>
+
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Total</h3><p id="stat-total">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart1"></canvas></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Actifs</h3><p id="stat-actifs">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart2"></canvas></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Archivés</h3><p id="stat-archives">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart3"></canvas></div>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <div class="table-header"><h2 id="page-title">Dossiers récents</h2></div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Diagnostic</th>
+                                <th class="hide-mobile">Statut</th>
+                                <th class="hide-mobile">Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patient-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-patient" class="modal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h2>Fiche Dossier</h2>
+                <span class="material-icons" id="close-modal" style="cursor:pointer">close</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                
+                <div class="field">
+                    <label>Nom du Patient</label>
+                    <input type="text" id="p-nom" class="m-input" placeholder="Ex: Jean Dupont">
+                </div>
+                
+                <div class="field">
+                    <label>Diagnostic</label>
+                    <input type="text" id="p-diag" class="m-input" placeholder="Ex: Appendicite aiguë">
+                </div>
+                
+                <div class="ocr-container">
+                    <label style="font-size:0.8rem; font-weight:bold; margin-top:10px; display:block;">Numérisation (OCR)</label>
+                    <div class="ocr-actions">
+                        <button id="start-camera" class="btn-outline-sm"><span class="material-icons">photo_camera</span> Ouvrir Caméra</button>
+                        <button id="capture-ocr" class="btn-main-sm" style="display:none; background:#27ae60;"><span class="material-icons">document_scanner</span> Capturer</button>
+                    </div>
+                    
+                    <div id="ocr-loader" class="loader" style="display:none;"></div>
+                    
+                    <video id="video" autoplay playsinline style="display:none; width:100%; border-radius:12px; margin-top:10px;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <textarea id="p-ocr-result" placeholder="Le texte scanné apparaîtra ici..."></textarea>
+                </div>
+            </div>
+            <button id="save-btn" class="btn-main full-w" style="margin-top:15px;">Enregistrer le dossier</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
+
