@@ -57,3 +57,13 @@ td { padding: 15px; border-bottom: 1px solid var(--border); }
 .field { margin-bottom: 15px; }
 .field label { font-size: 0.8rem; font-weight: 600; margin-bottom: 5px; display: block; }
 .field input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); }
+
+.status-actif { background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 8px; font-size: 0.8rem; }
+.status-archive { background: #f1f5f9; color: #475569; padding: 4px 8px; border-radius: 8px; font-size: 0.8rem; }
+
+/* Alignement des icônes d'action */
+td .btn-icon {
+    display: inline-flex;
+    vertical-align: middle;
+    margin-right: 4px;
+}
