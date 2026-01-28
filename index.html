@@ -17,7 +17,7 @@
         <div class="login-card">
             <span class="material-icons brand-large">analytics</span>
             <h2>VISCÉRA-CLOUD</h2>
-            <p>Accès Sécurisé</p>
+            <p>Gestion d'Archives Médicales</p>
             <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-password" placeholder="Mot de passe">
             <button id="login-btn" class="btn-main full-w">Se connecter</button>
@@ -45,9 +45,7 @@
                     <span class="material-icons">search</span>
                     <input type="text" id="search-input" placeholder="Rechercher...">
                 </div>
-                <div class="header-btns">
-                   <button id="open-modal-btn" class="btn-main circle-mobile"><span class="material-icons">add</span></button>
-                </div>
+                <button id="open-modal-btn" class="btn-main circle-btn"><span class="material-icons">add</span></button>
             </header>
 
             <section class="stats-section">
@@ -66,7 +64,8 @@
             </section>
 
             <section class="table-section">
-                <div class="table-scroll-container">
+                <div class="table-header"><h2 id="page-title">Dossiers récents</h2></div>
+                <div class="table-scroll">
                     <table>
                         <thead>
                             <tr>
@@ -74,6 +73,7 @@
                                 <th>Diagnostic</th>
                                 <th class="hide-mobile">Statut</th>
                                 <th class="hide-mobile">Date</th>
+                                <th>Modifier par</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -87,26 +87,31 @@
     <div id="modal-patient" class="modal">
         <div class="modal-box">
             <div class="modal-head">
-                <h2>Fiche Patient</h2>
-                <span class="material-icons" id="close-modal" style="cursor:pointer">close</span>
+                <h2>Fiche Dossier</h2>
+                <span class="material-icons" id="close-modal">close</span>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="edit-id">
-                <input type="text" id="p-nom" placeholder="Nom du patient" class="m-input">
-                <input type="text" id="p-diag" placeholder="Diagnostic" class="m-input">
-                
-                <div class="ocr-area">
-                    <div class="ocr-btns">
-                        <button id="start-camera" class="btn-outline-sm"><span class="material-icons">videocam</span></button>
-                        <button id="capture-ocr" class="btn-main-sm" style="display:none;"><span class="material-icons">scanner</span></button>
+                <div class="field">
+                    <label>Nom du Patient</label>
+                    <input type="text" id="p-nom" class="m-input">
+                </div>
+                <div class="field">
+                    <label>Diagnostic</label>
+                    <input type="text" id="p-diag" class="m-input">
+                </div>
+                <div class="ocr-container">
+                    <div class="ocr-actions">
+                        <button id="start-camera" class="btn-outline-sm"><span class="material-icons">photo_camera</span></button>
+                        <button id="capture-ocr" class="btn-main-sm" style="display:none; background:#27ae60;"><span class="material-icons">document_scanner</span> Analyser</button>
                     </div>
                     <div id="ocr-loader" class="loader" style="display:none;"></div>
-                    <video id="video" autoplay playsinline style="display:none; width:100%; border-radius:10px;"></video>
+                    <video id="video" autoplay playsinline style="display:none; width:100%; border-radius:12px; margin-top:10px;"></video>
                     <canvas id="canvas" style="display:none;"></canvas>
-                    <textarea id="p-ocr-result" placeholder="Texte extrait..."></textarea>
+                    <textarea id="p-ocr-result" placeholder="Résultat OCR..."></textarea>
                 </div>
             </div>
-            <button id="save-btn" class="btn-main full-w">Enregistrer</button>
+            <button id="save-btn" class="btn-main full-w">Sauvegarder dans le Cloud</button>
         </div>
     </div>
 
