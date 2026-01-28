@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VISCÉRA-CLOUD PRO</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2859/2859207.png">
+    
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
+
+    <style>
+        /* RESET ET BASES */
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        :root { 
+            --bg: #f5f7fb; --side: #1a237e; --accent: #3f51b5; --text: #2d3748; --card: #ffffff; --border: #e2e8f0;
+        }
+        
+        /* Thème Sombre */
+        body.dark-theme { 
+            --bg: #0b0e14; --side: #05070a; --accent: #5c6bc0; --text: #e6edf3; --card: #161b22; --border: #30363d;
+        }
+
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; transition: background 0.3s; }
+
+        /* ÉCRAN DE CONNEXION (Design Glassmorphism) */
+        #login-overlay { 
+            position: fixed; inset: 0; 
+            background: linear-gradient(135deg, #1a237e 0%, #0277bd 100%);
+            display: flex; align-items: center; justify-content: center; 
+            z-index: 9999; transition: opacity 0.5s ease;
+        }
+        .login-card { 
+            background: rgba(255, 255, 255, 0.95); padding: 40px; border-radius: 24px; 
+            width: 90%; max-width: 400px; text-align: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .brand-large { 
+            font-size: 4rem; margin-bottom: 10px; 
+            background: -webkit-linear-gradient(#1a237e, #0277bd); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .input-group { position: relative; margin-bottom: 15px; }
+        .input-group input { width: 100%; padding: 15px 15px 15px 45px; border-radius: 12px; border: 2px solid #e0e0e0; background: #f9f9f9; font-size: 1rem; outline: none; }
+        .input-group input:focus { border-color: var(--accent); background: white; }
+        .input-group .material-icons { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+        .btn-login { background: linear-gradient(90deg, #1a237e, #3f51b5); color: white; width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .error-txt { color: #e74c3c; margin-top: 15px; min-height: 20px; font-size: 0.9rem; }
+
+        /* LAYOUT PRINCIPAL */
+        #app-container { display: flex; height: 100vh; width: 100vw; }
+
+        /* Sidebar (Barre latérale) */
+        .sidebar { width: 260px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 20px; z-index: 100; transition: 0.3s; }
+        .side-brand { font-size: 1.3rem; font-weight: 800; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .sidebar li { list-style: none; padding: 12px; border-radius: 10px; margin-bottom: 5px; cursor: pointer; display: flex; align-items: center; gap: 12px; opacity: 0.7; }
+        .sidebar li.active { opacity: 1; background: rgba(255,255,255,0.15); }
+        .side-footer { margin-top: auto; display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.1); }
+        #theme-toggle { cursor: pointer; opacity: 0.8; }
+
+        /* Contenu Principal */
+        .main-content { flex: 1; padding: 20px; overflow-y: auto; }
+        .top-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; gap: 10px; }
+        .header-btns { display: flex; gap: 10px; }
+        .search-bar { background: var(--card); padding: 10px; border-radius: 12px; border: 1px solid var(--border); display: flex; align-items: center; flex: 1; max-width: 400px; }
+        .search-bar input { border: none; outline: none; background: transparent; color: var(--text); width: 100%; margin-left: 8px; font-size: 15px; }
+
+        /* Cartes Statistiques */
+        .stats-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: var(--card); padding: 15px; border-radius: 12px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .stat-info h3 { font-size: 0.8rem; opacity: 0.7; }
+        .stat-info p { font-size: 1.5rem; font-weight: 800; }
+        .stat-chart { width: 50px; height: 30px; }
+
+        /* Tableau */
+        .table-section { background: var(--card); border-radius: 12px; border: 1px solid var(--border); padding: 15px; }
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        th { text-align: left; padding: 12px; font-size: 0.75rem; border-bottom: 2px solid var(--border); opacity: 0.6; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+        .status-pill { padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+        .status-actif { background: #e3f9e5; color: #1f7a33; }
+        .status-archive { background: #fef3c7; color: #92400e; }
+
+        /* Boutons */
+        .btn-main { background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .btn-main-sm { color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; }
+        .btn-outline { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .btn-outline-sm { background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.85rem; }
+        .btn-icon { background: none; border: none; cursor: pointer; color: var(--text); opacity: 0.5; margin-right: 5px; vertical-align: middle; }
+        .circle-btn { border-radius: 50%; width: 42px; height: 42px; justify-content: center; padding: 0; }
+        .full-w { width: 100%; justify-content: center; }
+
+        /* Modale */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(5px); }
+        .modal-box { background: var(--card); width: 100%; max-width: 450px; border-radius: 20px; padding: 20px; max-height: 90vh; overflow-y: auto; }
+        .m-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-top: 5px; background: var(--bg); color: var(--text); outline: none; }
+        .ocr-container textarea { width: 100%; height: 80px; margin-top: 10px; padding: 10px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text); resize: none; }
+        .ocr-actions { display: flex; gap: 10px; margin-top: 5px; }
+
+        /* Loader */
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--accent); border-radius: 50%; width: 25px; height: 25px; animation: spin 1s linear infinite; margin: 10px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* MOBILE RESPONSIVE */
+        @media (max-width: 768px) {
+            #app-container { flex-direction: column; }
+            .sidebar { width: 100%; height: 65px; flex-direction: row; order: 2; padding: 5px 15px; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+            .side-brand, .nav-text { display: none; }
+            .sidebar nav { flex: 1; display: flex; justify-content: space-around; }
+            .main-content { order: 1; height: calc(100vh - 65px); padding: 15px; }
+            .stats-section { grid-template-columns: 1fr; }
+            .hide-mobile { display: none; }
+        }
+    </style>
+</head>
+<body class="light-theme">
+
+    <div id="login-overlay">
+        <div class="login-card">
+            <span class="material-icons brand-large">analytics</span>
+            <h2>VISCÉRA-CLOUD</h2>
+            <p>Espace Praticien Sécurisé</p>
+            
+            <div class="input-group">
+                <span class="material-icons">email</span>
+                <input type="email" id="login-email" placeholder="Email professionnel">
+            </div>
+            
+            <div class="input-group">
+                <span class="material-icons">lock</span>
+                <input type="password" id="login-password" placeholder="Mot de passe">
+            </div>
+
+            <button id="login-btn" class="btn-login">Se connecter</button>
+            <p id="login-error" class="error-txt"></p>
+        </div>
+    </div>
+
+    <div id="app-container" style="display:none;">
+        
+        <aside class="sidebar">
+            <div class="side-brand"><span class="material-icons">shield</span> MED-CLOUD</div>
+            <nav>
+                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> <span class="nav-text">Dashboard</span></li>
+                <li id="link-patients"><span class="material-icons">groups</span> <span class="nav-text">Patients</span></li>
+                <li id="link-archives"><span class="material-icons">inventory_2</span> <span class="nav-text">Archives</span></li>
+            </nav>
+            <div class="side-footer">
+                <div id="theme-toggle" title="Changer le thème"><span class="material-icons">dark_mode</span></div>
+                <button id="logout-btn"><span class="material-icons">logout</span></button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="search-bar">
+                    <span class="material-icons">search</span>
+                    <input type="text" id="search-input" placeholder="Rechercher un dossier...">
+                </div>
+                <div class="header-btns">
+                    <button id="export-global-btn" class="btn-outline" title="Exporter tout en Excel"><span class="material-icons">description</span></button>
+                    <button id="open-modal-btn" class="btn-main circle-btn"><span class="material-icons">add</span></button>
+                </div>
+            </header>
+
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Total</h3><p id="stat-total">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart1"></canvas></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Actifs</h3><p id="stat-actifs">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart2"></canvas></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Archivés</h3><p id="stat-archives">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart3"></canvas></div>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <div class="table-header"><h2 id="page-title">Dossiers récents</h2></div>
+                <div class="table-scroll">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Diagnostic</th>
+                                <th class="hide-mobile">Statut</th>
+                                <th class="hide-mobile">Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patient-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-patient" class="modal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h2>Fiche Dossier</h2>
+                <span class="material-icons" id="close-modal" style="cursor:pointer">close</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                
+                <div class="field">
+                    <label>Nom du Patient</label>
+                    <input type="text" id="p-nom" class="m-input" placeholder="Ex: Jean Dupont">
+                </div>
+                
+                <div class="field">
+                    <label>Diagnostic</label>
+                    <input type="text" id="p-diag" class="m-input" placeholder="Ex: Appendicite aiguë">
+                </div>
+                
+                <div class="ocr-container">
+                    <label style="font-size:0.8rem; font-weight:bold; margin-top:10px; display:block;">Numérisation (OCR)</label>
+                    <div class="ocr-actions">
+                        <button id="start-camera" class="btn-outline-sm"><span class="material-icons">photo_camera</span> Ouvrir Caméra</button>
+                        <button id="capture-ocr" class="btn-main-sm" style="display:none; background:#27ae60;"><span class="material-icons">document_scanner</span> Capturer</button>
+                    </div>
+                    
+                    <div id="ocr-loader" class="loader" style="display:none;"></div>
+                    <video id="video" autoplay playsinline style="display:none; width:100%; border-radius:12px; margin-top:10px;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <textarea id="p-ocr-result" placeholder="Le texte scanné apparaîtra ici..."></textarea>
+                </div>
+            </div>
+            <button id="save-btn" class="btn-main full-w" style="margin-top:15px;">Enregistrer le dossier</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAfORG83-_T4LP18oayAva3uS0nPCFPZcM",
+          authDomain: "med-archive-41eaf.firebaseapp.com",
+          projectId: "med-archive-41eaf",
+          storageBucket: "med-archive-41eaf.firebasestorage.app",
+          messagingSenderId: "529667535982",
+          appId: "1:529667535982:web:508f1525d641e75c4ba27f"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let allPatients = [];
+        let currentFilter = 'TOUT';
+
+        // --- AUTH ---
+        onAuthStateChanged(auth, (user) => {
+            const overlay = document.getElementById('login-overlay');
+            const appContainer = document.getElementById('app-container');
+
+            if (user) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    appContainer.style.display = 'flex';
+                }, 500);
+                initApp();
+            } else {
+                appContainer.style.display = 'none';
+                overlay.style.display = 'flex';
+                setTimeout(() => { overlay.style.opacity = '1'; }, 10);
+            }
+        });
+
+        document.getElementById('login-btn').onclick = async () => {
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-password').value;
+            try { 
+                await signInWithEmailAndPassword(auth, email, pass); 
+            } catch(e) { 
+                document.getElementById('login-error').innerText = "Identifiants incorrects."; 
+            }
+        };
+
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+
+        // --- APP LOGIC ---
+        const initApp = () => {
+            onSnapshot(collection(db, "patients"), (snap) => {
+                allPatients = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                render();
+            });
+
+            document.getElementById('link-dashboard').onclick = () => setTab('TOUT', 'link-dashboard');
+            document.getElementById('link-patients').onclick = () => setTab('Actif', 'link-patients');
+            document.getElementById('link-archives').onclick = () => setTab('Archivé', 'link-archives');
+        };
+
+        document.getElementById('theme-toggle').onclick = () => {
+            document.body.classList.toggle('dark-theme');
+        };
+
+        function setTab(filter, id) {
+            currentFilter = filter;
+            document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            render();
+        }
+
+        window.render = function() {
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const list = document.getElementById('patient-list');
+            list.innerHTML = "";
+
+            const filtered = allPatients.filter(p => {
+                const matchSearch = (p.nom || '').toLowerCase().includes(search) || (p.diagnostic || '').toLowerCase().includes(search);
+                const matchFilter = currentFilter === 'TOUT' ? true : p.statut === currentFilter;
+                return matchSearch && matchFilter;
+            });
+
+            filtered.forEach(p => {
+                const date = p.lastUpdate ? p.lastUpdate.toDate().toLocaleDateString('fr-FR') : '-';
+                
+                list.innerHTML += `
+                    <tr>
+                        <td><strong>${p.nom}</strong></td>
+                        <td>${p.diagnostic || '-'}</td>
+                        <td class="hide-mobile"><span class="status-pill ${p.statut === 'Actif' ? 'status-actif' : 'status-archive'}">${p.statut}</span></td>
+                        <td class="hide-mobile">${date}</td>
+                        <td>
+                            <button onclick="window.prepareEdit('${p.id}','${p.nom.replace(/'/g, "\\'")}', '${(p.diagnostic || '').replace(/'/g, "\\'")}')" class="btn-icon"><span class="material-icons">edit</span></button>
+                            <button onclick="window.toggleArchive('${p.id}','${p.statut}')" class="btn-icon" title="${p.statut === 'Actif' ? 'Archiver' : 'Activer'}"><span class="material-icons">inventory_2</span></button>
+                            <button onclick="window.downloadSingle('${p.id}')" class="btn-icon" style="color:#27ae60"><span class="material-icons">download</span></button>
+                            <button onclick="window.deleteP('${p.id}')" class="btn-icon" style="color:#e74c3c"><span class="material-icons">delete</span></button>
+                        </td>
+                    </tr>`;
+            });
+
+            document.getElementById('stat-total').innerText = allPatients.length;
+            document.getElementById('stat-actifs').innerText = allPatients.filter(p => p.statut === 'Actif').length;
+            document.getElementById('stat-archives').innerText = allPatients.filter(p => p.statut === 'Archivé').length;
+        }
+
+        document.getElementById('search-input').oninput = render;
+
+        // --- ACTIONS ---
+        document.getElementById('export-global-btn').onclick = () => {
+            if(allPatients.length === 0) return alert("Rien à exporter.");
+            const data = allPatients.map(p => ({ Nom: p.nom, Diagnostic: p.diagnostic, Statut: p.statut }));
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Global");
+            XLSX.writeFile(wb, "Viscera_Global.xlsx");
+        };
+
+        window.downloadSingle = (id) => {
+            const p = allPatients.find(x => x.id === id);
+            const ws = XLSX.utils.json_to_sheet([{ Patient: p.nom, Diagnostic: p.diagnostic, Statut: p.statut }]);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Patient");
+            XLSX.writeFile(wb, `Dossier_${p.nom}.xlsx`);
+        };
+
+        window.toggleArchive = async (id, current) => {
+            const newStatut = current === 'Actif' ? 'Archivé' : 'Actif';
+            await updateDoc(doc(db, "patients", id), { statut: newStatut });
+        };
+
+        window.deleteP = async (id) => {
+            if(confirm("Supprimer définitivement ?")) await deleteDoc(doc(db, "patients", id));
+        };
+
+        document.getElementById('save-btn').onclick = async () => {
+            const id = document.getElementById('edit-id').value;
+            const nom = document.getElementById('p-nom').value;
+            const diag = document.getElementById('p-diag').value;
+            
+            if(!nom) return alert("Nom requis");
+            const data = { nom, diagnostic: diag, lastUpdate: serverTimestamp(), auteur: auth.currentUser.email };
+
+            if (id) await updateDoc(doc(db, "patients", id), data);
+            else { data.statut = 'Actif'; await addDoc(collection(db, "patients"), data); }
+            closeModal();
+        };
+
+        // --- CAMERA ---
+        let stream;
+        document.getElementById('start-camera').onclick = async () => {
+            const loader = document.getElementById('ocr-loader');
+            const video = document.getElementById('video');
+            const btnCap = document.getElementById('capture-ocr');
+            loader.style.display = 'block'; video.style.display = 'none';
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    loader.style.display = 'none'; video.style.display = 'block'; btnCap.style.display = 'flex';
+                };
+            } catch (e) { loader.style.display = 'none'; alert("Erreur Caméra (HTTPS requis)"); }
+        };
+
+        document.getElementById('capture-ocr').onclick = async () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            document.getElementById('p-ocr-result').value = "Analyse...";
+            const res = await Tesseract.recognize(canvas, 'fra');
+            document.getElementById('p-ocr-result').value = res.data.text;
+        };
+
+        // --- UI ---
+        window.prepareEdit = (id, nom, diag) => {
+            document.getElementById('edit-id').value = id; document.getElementById('p-nom').value = nom; document.getElementById('p-diag').value = diag; document.getElementById('p-ocr-result').value = "";
+            document.getElementById('modal-patient').style.display = 'flex';
+        };
+        const closeModal = () => {
+            document.getElementById('modal-patient').style.display = 'none';
+            if(stream) stream.getTracks().forEach(t => t.stop());
+            document.getElementById('video').style.display = 'none';
+            document.getElementById('capture-ocr').style.display = 'none';
+        };
+        document.getElementById('open-modal-btn').onclick = () => {
+            document.getElementById('edit-id').value = ""; document.getElementById('p-nom').value = ""; document.getElementById('p-diag').value = "";
+            document.getElementById('modal-patient').style.display = 'flex';
+        };
+        document.getElementById('close-modal').onclick = closeModal;
+    </script>
+</body>
+</html>
