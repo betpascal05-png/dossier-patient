@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VISCÉRAL-CLOUD PRO</title>
+    <title>VISCÉRA-CLOUD PRO</title>
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2859/2859207.png">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -16,26 +16,26 @@
     <div id="login-overlay">
         <div class="login-card">
             <span class="material-icons brand-large">analytics</span>
-            <h2>VISCÉRAL-CLOUD PRO</h2>
-            <p>Connectez-vous à votre espace sécurisé</p>
+            <h2>VISCÉRA-CLOUD</h2>
+            <p>Gestion d'Archives Médicales</p>
             <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-password" placeholder="Mot de passe">
-            <button id="login-btn" class="btn-main">Connexion</button>
+            <button id="login-btn" class="btn-main">Se connecter</button>
             <p id="login-error" class="error-txt"></p>
         </div>
     </div>
 
     <div id="app-container" style="display:none;">
         <aside class="sidebar">
-            <div class="side-brand"><span class="material-icons">shield</span> VISCÉRAL-CLOUD</div>
+            <div class="side-brand"><span class="material-icons">shield</span> MED-CLOUD</div>
             <nav>
-                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> Tableau de bord</li>
-                <li id="link-patients"><span class="material-icons">people</span> Tous les Patients</li>
-                <li id="link-archives"><span class="material-icons">inventory</span> Archives</li>
+                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> Tableau de Bord</li>
+                <li id="link-patients"><span class="material-icons">groups</span> Tous les Patients</li>
+                <li id="link-archives"><span class="material-icons">inventory_2</span> Archives</li>
             </nav>
             <div class="side-footer">
                 <div id="theme-toggle"><span class="material-icons">dark_mode</span></div>
-                <button id="logout-btn"><span class="material-icons">logout</span> Quitter</button>
+                <button id="logout-btn"><span class="material-icons">logout</span> Déconnexion</button>
             </div>
         </aside>
 
@@ -43,52 +43,48 @@
             <header class="top-header">
                 <div class="search-bar">
                     <span class="material-icons">search</span>
-                    <input type="text" id="search-input" placeholder="Rechercher un dossier...">
+                    <input type="text" id="search-input" placeholder="Rechercher un patient ou diagnostic...">
                 </div>
                 <div class="actions-header">
-                    <button id="export-btn" class="btn-outline"><span class="material-icons">file_download</span> Export Excel</button>
+                    <button id="export-global-btn" class="btn-outline"><span class="material-icons">description</span> Export Global</button>
                     <button id="open-modal-btn" class="btn-main"><span class="material-icons">add</span> Nouveau Dossier</button>
                 </div>
             </header>
 
             <section class="stats-section">
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Total Patients</h3><p id="stat-total">0</p></div>
+                    <div class="stat-info"><h3>Total Dossiers</h3><p id="stat-total">0</p></div>
                     <div class="stat-chart"><canvas id="miniChart1"></canvas></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Cas Actifs</h3><p id="stat-actifs" class="txt-green">0</p></div>
+                    <div class="stat-info"><h3>Cas Actifs</h3><p id="stat-actifs">0</p></div>
                     <div class="stat-chart"><canvas id="miniChart2"></canvas></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Archivés</h3><p id="stat-archives" class="txt-orange">0</p></div>
+                    <div class="stat-info"><h3>Archivés</h3><p id="stat-archives">0</p></div>
                     <div class="stat-chart"><canvas id="miniChart3"></canvas></div>
                 </div>
             </section>
 
             <section class="table-section">
                 <div class="table-header">
-                    <h2 id="page-title">Dossiers Récents</h2>
-                    <select id="filter-status">
-                        <option value="TOUT">Tous les statuts</option>
-                        <option value="Actif">Actifs</option>
-                        <option value="Archivé">Archivés</option>
-                    </select>
+                    <h2 id="page-title">Dossiers récents</h2>
                 </div>
-               <div class="scroll-table">
-    <table id="main-table">
-        <thead>
-            <tr>
-                <th>Patient</th>
-                <th>Diagnostic</th>
-                <th>Statut</th>
-                <th>Modifié le</th>
-                <th>Modifier par</th> <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="patient-list"></tbody>
-    </table>
-</div>
+                <div class="scroll-table">
+                    <table id="main-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Diagnostic</th>
+                                <th>Statut</th>
+                                <th>Modifié le</th>
+                                <th>Modifier par</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patient-list"></tbody>
+                    </table>
+                </div>
             </section>
         </main>
     </div>
@@ -96,34 +92,35 @@
     <div id="modal-patient" class="modal">
         <div class="modal-box">
             <div class="modal-head">
-                <h2 id="modal-title">Fiche Dossier</h2>
+                <h2 id="modal-title">Fiche Dossier Medical</h2>
                 <span class="material-icons btn-close" id="close-modal">close</span>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="edit-id">
                 <div class="field">
-                    <label>Nom complet du patient</label>
-                    <input type="text" id="p-nom">
+                    <label>Nom Complet</label>
+                    <input type="text" id="p-nom" placeholder="Ex: Jean Dupont">
                 </div>
                 <div class="field">
-                    <label>Diagnostic viscéral</label>
-                    <input type="text" id="p-diag">
+                    <label>Diagnostic Médical</label>
+                    <input type="text" id="p-diag" placeholder="Saisir le diagnostic...">
                 </div>
-                <div class="ocr-box">
-                    <div class="cam-btns">
-                        <button id="start-camera" class="btn-outline"><span class="material-icons">camera_alt</span></button>
-                        <button id="capture-ocr" class="btn-main" style="display:none;">Analyser Scan</button>
+                <div class="ocr-section">
+                    <label>Numérisation OCR</label>
+                    <div class="ocr-controls">
+                        <button id="start-camera" class="btn-outline-sm"><span class="material-icons">photo_camera</span> Ouvrir Caméra</button>
                     </div>
-                    <video id="video" autoplay playsinline style="display:none;"></video>
-                    <textarea id="p-ocr-result" placeholder="Données extraites par OCR..."></textarea>
+                    <div id="ocr-loader" class="loader" style="display:none;"></div>
+                    <video id="video" autoplay playsinline style="display:none; width:100%; border-radius:10px; margin-top:10px;"></video>
+                    <textarea id="p-ocr-result" placeholder="Texte extrait du scanner..."></textarea>
                 </div>
             </div>
-            <button id="save-btn" class="btn-main full-w">Sauvegarder dans le Cloud</button>
+            <div class="modal-footer">
+                <button id="save-btn" class="btn-main full-w">Sauvegarder dans le Cloud</button>
+            </div>
         </div>
     </div>
 
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
-
