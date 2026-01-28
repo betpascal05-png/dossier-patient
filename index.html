@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MED-ARCHIVE | Système Sécurisé</title>
+    <title>MED-ARCHIVE | Chirurgie Viscérale</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/387/387561.png">
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
@@ -12,9 +13,10 @@
 
     <div id="login-overlay">
         <div class="login-card">
-            <span class="material-icons login-icon">lock</span>
-            <h2>Accès MED-ARCHIVE</h2>
-            <input type="email" id="login-email" placeholder="Email (ex: betpascal05@gmail.com)" required>
+            <span class="material-icons login-icon">medical_services</span>
+            <h2>MED-ARCHIVE</h2>
+            <p>Unité de Chirurgie Viscérale</p>
+            <input type="email" id="login-email" placeholder="Email professionnel" required>
             <input type="password" id="login-password" placeholder="Mot de passe" required>
             <button id="login-btn" class="main-btn">Se connecter</button>
             <p id="login-error" class="error-message"></p>
@@ -23,14 +25,14 @@
 
     <div id="app-container" style="display:none;">
         <nav class="sidebar">
-            <div class="logo"><span class="material-icons">cloud_done</span> MED-CLOUD</div>
+            <div class="logo"><span class="material-icons">healing</span> VISCÉRA-CLOUD</div>
             <div class="user-badge">
                 <span id="user-display">Utilisateur</span>
                 <button id="logout-btn"><span class="material-icons">logout</span></button>
             </div>
             <ul>
                 <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> Dashboard</li>
-                <li id="link-patients"><span class="material-icons">person</span> Dossiers Actifs</li>
+                <li id="link-patients"><span class="material-icons">groups</span> Dossiers Actifs</li>
                 <li id="link-archives"><span class="material-icons">inventory_2</span> Archives</li>
             </ul>
         </nav>
@@ -60,19 +62,18 @@
 
     <div id="modal-patient" class="modal">
         <div class="modal-content">
-            <h2>Fiche Patient</h2>
-            <input type="text" id="p-nom" placeholder="NOM ET PRÉNOM DU PATIENT">
-            <input type="text" id="p-diag" placeholder="DIAGNOSTIC OU MOTIF">
+            <h2 id="modal-title">Fiche Patient</h2>
+            <input type="hidden" id="edit-id"> <input type="text" id="p-nom" placeholder="NOM ET PRÉNOM DU PATIENT">
+            <input type="text" id="p-diag" placeholder="DIAGNOSTIC VISCÉRAL">
             
             <div class="ocr-zone">
-                <p style="font-size: 0.8rem; margin-bottom: 10px; color: #666;">Scanner un document :</p>
                 <video id="video" autoplay playsinline style="width:100%; display:none; border-radius:10px; margin-bottom: 10px;"></video>
                 <canvas id="canvas" style="display:none;"></canvas>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; margin-bottom:10px;">
                     <button type="button" id="start-camera" class="btn-secondary">Ouvrir Caméra</button>
-                    <button type="button" id="capture-ocr" class="btn-secondary" style="display:none; background:#2ecc71;">Capturer le texte</button>
+                    <button type="button" id="capture-ocr" class="btn-secondary" style="display:none; background:#2ecc71;">Scanner Document</button>
                 </div>
-                <textarea id="p-ocr-result" placeholder="Le texte extrait apparaîtra ici..."></textarea>
+                <textarea id="p-ocr-result" placeholder="Texte extrait de l'examen..."></textarea>
             </div>
 
             <div class="modal-footer">
