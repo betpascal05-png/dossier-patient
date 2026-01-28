@@ -14,7 +14,7 @@
         <div class="login-card">
             <span class="material-icons login-icon">lock</span>
             <h2>Accès MED-ARCHIVE</h2>
-            <input type="email" id="login-email" placeholder="Email" required>
+            <input type="email" id="login-email" placeholder="Email (ex: betpascal05@gmail.com)" required>
             <input type="password" id="login-password" placeholder="Mot de passe" required>
             <button id="login-btn" class="main-btn">Se connecter</button>
             <p id="login-error" class="error-message"></p>
@@ -25,7 +25,7 @@
         <nav class="sidebar">
             <div class="logo"><span class="material-icons">cloud_done</span> MED-CLOUD</div>
             <div class="user-badge">
-                <span id="user-display">Chargement...</span>
+                <span id="user-display">Utilisateur</span>
                 <button id="logout-btn"><span class="material-icons">logout</span></button>
             </div>
             <ul>
@@ -60,20 +60,23 @@
 
     <div id="modal-patient" class="modal">
         <div class="modal-content">
-            <h2>Dossier Médical</h2>
-            <input type="text" id="p-nom" placeholder="NOM COMPLET">
-            <input type="text" id="p-diag" placeholder="Diagnostic">
+            <h2>Fiche Patient</h2>
+            <input type="text" id="p-nom" placeholder="NOM ET PRÉNOM DU PATIENT">
+            <input type="text" id="p-diag" placeholder="DIAGNOSTIC OU MOTIF">
             
             <div class="ocr-zone">
-                <video id="video" autoplay playsinline style="width:100%; display:none; border-radius:10px;"></video>
+                <p style="font-size: 0.8rem; margin-bottom: 10px; color: #666;">Scanner un document :</p>
+                <video id="video" autoplay playsinline style="width:100%; display:none; border-radius:10px; margin-bottom: 10px;"></video>
                 <canvas id="canvas" style="display:none;"></canvas>
-                <button type="button" id="start-camera" class="btn-secondary">Ouvrir Caméra</button>
-                <button type="button" id="capture-ocr" class="btn-secondary" style="display:none; background:#2ecc71;">Capturer</button>
-                <textarea id="p-ocr-result" placeholder="Texte extrait..."></textarea>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" id="start-camera" class="btn-secondary">Ouvrir Caméra</button>
+                    <button type="button" id="capture-ocr" class="btn-secondary" style="display:none; background:#2ecc71;">Capturer le texte</button>
+                </div>
+                <textarea id="p-ocr-result" placeholder="Le texte extrait apparaîtra ici..."></textarea>
             </div>
 
             <div class="modal-footer">
-                <button id="save-btn" class="main-btn">Sauvegarder</button>
+                <button id="save-btn" class="main-btn">Enregistrer</button>
                 <button id="close-modal" class="btn-delete">Annuler</button>
             </div>
         </div>
