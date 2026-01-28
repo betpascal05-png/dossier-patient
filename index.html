@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VISCÉRA-CLOUD PRO</title>
+    <title>VISCÉRALE-CLOUD PRO</title>
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2859/2859207.png">
     
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -122,7 +122,7 @@
     <div id="login-overlay">
         <div class="login-card">
             <span class="material-icons brand-large">analytics</span>
-            <h2>VISCÉRA-CLOUD</h2>
+            <h2>VISCÉRALE-CLOUD</h2>
             <p>Espace Praticien Sécurisé</p>
             
             <div class="input-group">
@@ -356,7 +356,7 @@
             const ws = XLSX.utils.json_to_sheet(data);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Global");
-            XLSX.writeFile(wb, "Viscera_Global.xlsx");
+            XLSX.writeFile(wb, "Viscerale_Global.xlsx");
         };
 
         window.downloadSingle = (id) => {
@@ -433,4 +433,5 @@
         document.getElementById('close-modal').onclick = closeModal;
     </script>
 </body>
+
 </html>
