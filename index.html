@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VISCÉRA-CLOUD PRO</title>
     <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2859/2859207.png">
     <link rel="stylesheet" href="style.css">
@@ -17,10 +17,10 @@
         <div class="login-card">
             <span class="material-icons brand-large">analytics</span>
             <h2>VISCÉRA-CLOUD</h2>
-            <p>Gestion d'Archives Médicales</p>
+            <p>Accès Sécurisé</p>
             <input type="email" id="login-email" placeholder="Email">
             <input type="password" id="login-password" placeholder="Mot de passe">
-            <button id="login-btn" class="btn-main">Se connecter</button>
+            <button id="login-btn" class="btn-main full-w">Se connecter</button>
             <p id="login-error" class="error-txt"></p>
         </div>
     </div>
@@ -29,13 +29,13 @@
         <aside class="sidebar">
             <div class="side-brand"><span class="material-icons">shield</span> MED-CLOUD</div>
             <nav>
-                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> Tableau de Bord</li>
-                <li id="link-patients"><span class="material-icons">groups</span> Tous les Patients</li>
-                <li id="link-archives"><span class="material-icons">inventory_2</span> Archives</li>
+                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> <span class="nav-text">Dashboard</span></li>
+                <li id="link-patients"><span class="material-icons">groups</span> <span class="nav-text">Patients</span></li>
+                <li id="link-archives"><span class="material-icons">inventory_2</span> <span class="nav-text">Archives</span></li>
             </nav>
             <div class="side-footer">
                 <div id="theme-toggle"><span class="material-icons">dark_mode</span></div>
-                <button id="logout-btn"><span class="material-icons">logout</span> Déconnexion</button>
+                <button id="logout-btn"><span class="material-icons">logout</span></button>
             </div>
         </aside>
 
@@ -43,21 +43,20 @@
             <header class="top-header">
                 <div class="search-bar">
                     <span class="material-icons">search</span>
-                    <input type="text" id="search-input" placeholder="Rechercher un patient ou diagnostic...">
+                    <input type="text" id="search-input" placeholder="Rechercher...">
                 </div>
-                <div class="actions-header">
-                    <button id="export-global-btn" class="btn-outline"><span class="material-icons">description</span> Export Global</button>
-                    <button id="open-modal-btn" class="btn-main"><span class="material-icons">add</span> Nouveau Dossier</button>
+                <div class="header-btns">
+                   <button id="open-modal-btn" class="btn-main circle-mobile"><span class="material-icons">add</span></button>
                 </div>
             </header>
 
             <section class="stats-section">
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Total Dossiers</h3><p id="stat-total">0</p></div>
+                    <div class="stat-info"><h3>Total</h3><p id="stat-total">0</p></div>
                     <div class="stat-chart"><canvas id="miniChart1"></canvas></div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-info"><h3>Cas Actifs</h3><p id="stat-actifs">0</p></div>
+                    <div class="stat-info"><h3>Actifs</h3><p id="stat-actifs">0</p></div>
                     <div class="stat-chart"><canvas id="miniChart2"></canvas></div>
                 </div>
                 <div class="stat-card">
@@ -67,18 +66,14 @@
             </section>
 
             <section class="table-section">
-                <div class="table-header">
-                    <h2 id="page-title">Dossiers récents</h2>
-                </div>
-                <div class="scroll-table">
-                    <table id="main-table">
+                <div class="table-scroll-container">
+                    <table>
                         <thead>
                             <tr>
                                 <th>Patient</th>
                                 <th>Diagnostic</th>
-                                <th>Statut</th>
-                                <th>Modifié le</th>
-                                <th>Modifier par</th>
+                                <th class="hide-mobile">Statut</th>
+                                <th class="hide-mobile">Date</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -92,32 +87,26 @@
     <div id="modal-patient" class="modal">
         <div class="modal-box">
             <div class="modal-head">
-                <h2 id="modal-title">Fiche Dossier Medical</h2>
-                <span class="material-icons btn-close" id="close-modal">close</span>
+                <h2>Fiche Patient</h2>
+                <span class="material-icons" id="close-modal" style="cursor:pointer">close</span>
             </div>
             <div class="modal-body">
                 <input type="hidden" id="edit-id">
-                <div class="field">
-                    <label>Nom Complet</label>
-                    <input type="text" id="p-nom" placeholder="Ex: Jean Dupont">
-                </div>
-                <div class="field">
-                    <label>Diagnostic Médical</label>
-                    <input type="text" id="p-diag" placeholder="Saisir le diagnostic...">
-                </div>
-                <div class="ocr-section">
-                    <label>Numérisation OCR</label>
-                    <div class="ocr-controls">
-                        <button id="start-camera" class="btn-outline-sm"><span class="material-icons">photo_camera</span> Ouvrir Caméra</button>
+                <input type="text" id="p-nom" placeholder="Nom du patient" class="m-input">
+                <input type="text" id="p-diag" placeholder="Diagnostic" class="m-input">
+                
+                <div class="ocr-area">
+                    <div class="ocr-btns">
+                        <button id="start-camera" class="btn-outline-sm"><span class="material-icons">videocam</span></button>
+                        <button id="capture-ocr" class="btn-main-sm" style="display:none;"><span class="material-icons">scanner</span></button>
                     </div>
                     <div id="ocr-loader" class="loader" style="display:none;"></div>
-                    <video id="video" autoplay playsinline style="display:none; width:100%; border-radius:10px; margin-top:10px;"></video>
-                    <textarea id="p-ocr-result" placeholder="Texte extrait du scanner..."></textarea>
+                    <video id="video" autoplay playsinline style="display:none; width:100%; border-radius:10px;"></video>
+                    <canvas id="canvas" style="display:none;"></canvas>
+                    <textarea id="p-ocr-result" placeholder="Texte extrait..."></textarea>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button id="save-btn" class="btn-main full-w">Sauvegarder dans le Cloud</button>
-            </div>
+            <button id="save-btn" class="btn-main full-w">Enregistrer</button>
         </div>
     </div>
 
