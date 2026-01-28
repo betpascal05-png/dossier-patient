@@ -1,39 +1,47 @@
-:root { --primary: #2c3e50; --accent: #3498db; --danger: #e74c3c; --bg: #f4f7f6; }
+:root { --primary: #2c3e50; --accent: #3498db; --danger: #e74c3c; --success: #2ecc71; --warning: #f39c12; --bg: #f4f7f6; }
 * { margin:0; padding:0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
 
+/* Connexion */
+#login-overlay { position: fixed; inset: 0; background: var(--accent); z-index: 2000; display: flex; align-items: center; justify-content: center; }
+.login-card { background: white; padding: 40px; border-radius: 15px; width: 350px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+.login-icon { font-size: 50px; color: var(--accent); margin-bottom: 20px; }
+.login-card input { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 8px; }
+
+/* Application Layout */
 #app-container { display: flex; min-height: 100vh; }
-
-.sidebar { width: 260px; background: var(--primary); color: white; padding: 20px 0; }
-.logo { padding: 0 20px 20px; font-weight: bold; display: flex; align-items: center; gap: 10px; font-size: 1.2rem; }
-
-.sidebar ul { list-style: none; }
-.sidebar li { 
-    padding: 15px 25px; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    gap: 15px; /* Espace entre l'icône et le texte */
-    transition: 0.3s;
-    color: rgba(255,255,255,0.7);
-}
-.sidebar li:hover { background: rgba(255,255,255,0.1); color: white; }
+.sidebar { width: 260px; background: var(--primary); color: white; padding: 20px 0; flex-shrink: 0; }
+.sidebar li { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: rgba(255,255,255,0.7); }
 .sidebar li.active { background: var(--accent); color: white; border-left: 4px solid white; }
 
-.user-badge { background: rgba(255,255,255,0.1); margin: 10px 20px; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; font-size: 0.8rem; }
+.content { flex: 1; padding: 30px; background: var(--bg); }
+.main-btn { background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; }
 
-.content { flex: 1; padding: 30px; }
+/* Tableau */
 .table-container { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 20px; }
 .patient-table { width: 100%; border-collapse: collapse; }
-.patient-table th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #888; font-size: 0.9rem; }
+.patient-table th { text-align: left; padding: 12px; border-bottom: 2px solid #eee; color: #888; font-size: 0.85rem; }
 .patient-table td { padding: 15px 12px; border-bottom: 1px solid #f9f9f9; }
 
+/* Statut et Actions */
 .status { padding: 4px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: bold; background: #eee; }
 .active-status { background: #e3fcef; color: #27ae60; }
+.btn-icon { background: none; border: none; cursor: pointer; margin-right: 10px; transition: 0.2s; }
+.btn-icon:hover { transform: scale(1.2); }
 
-/* Boutons d'action dans le tableau */
-.btn-icon { background: none; border: none; cursor: pointer; color: var(--primary); margin-right: 10px; }
-.btn-icon:hover { color: var(--accent); }
-
-/* Modale */
+/* --- STYLE DU FORMULAIRE "NOUVEAU DOSSIER" --- */
 .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 1000; }
-.modal-content { background: white; padding: 25px; border-radius: 15px; width: 450px; }
+.modal-content { background: white; padding: 30px; border-radius: 15px; width: 500px; max-width: 95%; }
+.modal-content h2 { margin-bottom: 20px; }
+.modal-content input, .modal-content textarea { 
+    width: 100%; 
+    padding: 12px; 
+    margin-bottom: 15px; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    display: block; 
+    font-size: 1rem;
+}
+.ocr-zone { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px dashed #ccc; }
+.btn-secondary { background: #7f8c8d; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; flex: 1; }
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; }
+.btn-delete { background: var(--danger); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; }
