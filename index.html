@@ -1,63 +1,127 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>MED-ARCHIVE | Dashboard</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VISCÉRA-CLOUD PRO</title>
+    <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/2859/2859207.png">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
 </head>
-<body>
+<body class="light-theme">
 
-<div id="login-overlay">
-  <div class="login-card">
-    <span class="material-icons">medical_services</span>
-    <h2>MED-ARCHIVE</h2>
-    <input id="login-email" placeholder="Email">
-    <input id="login-password" type="password" placeholder="Mot de passe">
-    <button id="login-btn">Connexion</button>
-  </div>
-</div>
-
-<div id="app-container" style="display:none;">
-  <nav class="sidebar">
-    <h2>MED-ARCHIVE</h2>
-    <button id="logout-btn">Déconnexion</button>
-  </nav>
-
-  <main class="content">
-    <header>
-      <h1>Dashboard</h1>
-      <div class="toolbar">
-        <input id="search-input" placeholder="🔍 Rechercher...">
-        <select id="filter-status">
-          <option value="TOUT">Tous</option>
-          <option value="Actif">Actif</option>
-          <option value="Archivé">Archivé</option>
-        </select>
-        <button id="export-btn">Exporter Excel</button>
-        <button id="theme-toggle">🌙</button>
-      </div>
-    </header>
-
-    <div class="stats-grid">
-      <div class="stat-card">Actifs <h2 id="stat-actif">0</h2></div>
-      <div class="stat-card">Archivés <h2 id="stat-archive">0</h2></div>
-      <div class="stat-card">Total <h2 id="stat-total">0</h2></div>
+    <div id="login-overlay">
+        <div class="login-card">
+            <span class="material-icons brand-large">analytics</span>
+            <h2>VISCÉRA-CLOUD PRO</h2>
+            <p>Connectez-vous à votre espace sécurisé</p>
+            <input type="email" id="login-email" placeholder="Email">
+            <input type="password" id="login-password" placeholder="Mot de passe">
+            <button id="login-btn" class="btn-main">Connexion</button>
+            <p id="login-error" class="error-txt"></p>
+        </div>
     </div>
 
-    <canvas id="chart-dossiers"></canvas>
+    <div id="app-container" style="display:none;">
+        <aside class="sidebar">
+            <div class="side-brand"><span class="material-icons">shield</span> VISCÉRA-CLOUD</div>
+            <nav>
+                <li id="link-dashboard" class="active"><span class="material-icons">dashboard</span> Tableau de bord</li>
+                <li id="link-patients"><span class="material-icons">people</span> Tous les Patients</li>
+                <li id="link-archives"><span class="material-icons">inventory</span> Archives</li>
+            </nav>
+            <div class="side-footer">
+                <div id="theme-toggle"><span class="material-icons">dark_mode</span></div>
+                <button id="logout-btn"><span class="material-icons">logout</span> Quitter</button>
+            </div>
+        </aside>
 
-    <table>
-      <thead>
-        <tr><th>Patient</th><th>Diagnostic</th><th>Statut</th><th>Auteur</th></tr>
-      </thead>
-      <tbody id="patient-list"></tbody>
-    </table>
-  </main>
-</div>
+        <main class="main-content">
+            <header class="top-header">
+                <div class="search-bar">
+                    <span class="material-icons">search</span>
+                    <input type="text" id="search-input" placeholder="Rechercher un dossier...">
+                </div>
+                <div class="actions-header">
+                    <button id="export-btn" class="btn-outline"><span class="material-icons">file_download</span> Export Excel</button>
+                    <button id="open-modal-btn" class="btn-main"><span class="material-icons">add</span> Nouveau Dossier</button>
+                </div>
+            </header>
 
-<script type="module" src="script.js"></script>
+            <section class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Total Patients</h3><p id="stat-total">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart1"></canvas></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Cas Actifs</h3><p id="stat-actifs" class="txt-green">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart2"></canvas></div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info"><h3>Archivés</h3><p id="stat-archives" class="txt-orange">0</p></div>
+                    <div class="stat-chart"><canvas id="miniChart3"></canvas></div>
+                </div>
+            </section>
+
+            <section class="table-section">
+                <div class="table-header">
+                    <h2 id="page-title">Dossiers Récents</h2>
+                    <select id="filter-status">
+                        <option value="TOUT">Tous les statuts</option>
+                        <option value="Actif">Actifs</option>
+                        <option value="Archivé">Archivés</option>
+                    </select>
+                </div>
+                <div class="scroll-table">
+                    <table id="main-table">
+                        <thead>
+                            <tr>
+                                <th>Patient</th>
+                                <th>Diagnostic</th>
+                                <th>Statut</th>
+                                <th>Modifié le</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patient-list"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="modal-patient" class="modal">
+        <div class="modal-box">
+            <div class="modal-head">
+                <h2 id="modal-title">Fiche Dossier</h2>
+                <span class="material-icons btn-close" id="close-modal">close</span>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="edit-id">
+                <div class="field">
+                    <label>Nom complet du patient</label>
+                    <input type="text" id="p-nom">
+                </div>
+                <div class="field">
+                    <label>Diagnostic viscéral</label>
+                    <input type="text" id="p-diag">
+                </div>
+                <div class="ocr-box">
+                    <div class="cam-btns">
+                        <button id="start-camera" class="btn-outline"><span class="material-icons">camera_alt</span></button>
+                        <button id="capture-ocr" class="btn-main" style="display:none;">Analyser Scan</button>
+                    </div>
+                    <video id="video" autoplay playsinline style="display:none;"></video>
+                    <textarea id="p-ocr-result" placeholder="Données extraites par OCR..."></textarea>
+                </div>
+            </div>
+            <button id="save-btn" class="btn-main full-w">Sauvegarder dans le Cloud</button>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
 </body>
 </html>
